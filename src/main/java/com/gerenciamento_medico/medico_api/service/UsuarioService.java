@@ -3,10 +3,17 @@ package com.gerenciamento_medico.medico_api.service;
 import com.gerenciamento_medico.medico_api.model.Role;
 import com.gerenciamento_medico.medico_api.model.Usuario;
 import com.gerenciamento_medico.medico_api.repository.UsuarioRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,8 +23,12 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+//    @Autowired
+//    private PasswordEncoder criptografiaSenha;
+
     public Usuario cadastrarUsuario(Usuario usuario) {
         usuario.setId(null);
+//        usuario.setSenha(criptografiaSenha.encode(usuario.getSenha()));
         return usuarioRepository.save(usuario);
     }
 
@@ -47,14 +58,13 @@ public class UsuarioService {
         if (usuarioOptional.isPresent()) {
             Usuario usuario = usuarioOptional.get();
 
-            // Verifica se o usuário tem a role de MÉDICO
             if (usuario.getRole() == Role.MEDICO) {
-                return Optional.of(usuario);  // Retorna o usuário se for médico
+                return Optional.of(usuario);
             } else {
-                return Optional.empty();  // Retorna vazio se não for médico
+                return Optional.empty();
             }
         }
 
-        return Optional.empty();  // Retorna vazio se o usuário não for encontrado
+        return Optional.empty();
     }
 }

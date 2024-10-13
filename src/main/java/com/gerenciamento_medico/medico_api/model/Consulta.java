@@ -1,8 +1,13 @@
 package com.gerenciamento_medico.medico_api.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 public class Consulta {
 
@@ -18,59 +23,17 @@ public class Consulta {
     @JoinColumn(name = "medico_id")
     private Usuario medico;
 
+    @Column(nullable = false)
     private LocalDateTime dataConsulta;
+
+    @Column(nullable = false)
+    private String motivoConsulta;
+
+    @Column(nullable = false)
+    private String localConsulta;
 
     @Enumerated(EnumType.STRING)
     private StatusConsulta status;
 
-    private String parecerMedico; // Parecer final do médico
-
-    // Getters e Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Usuario getPaciente() {
-        return paciente;
-    }
-
-    public void setPaciente(Usuario paciente) {
-        this.paciente = paciente;
-    }
-
-    public Usuario getMedico() {
-        return medico;
-    }
-
-    public void setMedico(Usuario medico) {
-        this.medico = medico;
-    }
-
-    public LocalDateTime getDataConsulta() {
-        return dataConsulta;
-    }
-
-    public void setDataConsulta(LocalDateTime dataConsulta) {
-        this.dataConsulta = dataConsulta;
-    }
-
-    public StatusConsulta getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusConsulta status) {
-        this.status = status;
-    }
-
-    public String getParecerMedico() {
-        return parecerMedico;
-    }
-
-    public void setParecerMedico(String parecerMedico) {
-        this.parecerMedico = parecerMedico;
-    }
+    private String parecerMedico;
 }

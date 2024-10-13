@@ -24,14 +24,6 @@ public class ConsultaService {
     private UsuarioService usuarioService;
 
     public Consulta solicitarConsulta(Consulta consulta) {
-//        Optional<Usuario> medicoOptional = usuarioService.buscarMedicoPorId(consulta.getMedico().getId());
-//        if (medicoOptional.isPresent()) {
-//            consulta.setStatus(StatusConsulta.PENDENTE);
-//            consulta.setMedico(medicoOptional.get()); // Atribui o médico encontrado
-//            consulta.setPaciente(consulta.getPaciente()); // Atribui o paciente recebido
-//            return consultaRepository.save(consulta);
-//        }
-//        throw new IllegalArgumentException("O usuário não é um médico válido.");
         Optional<Usuario> medico = this.usuarioService.buscarMedicoPorId(consulta.getMedico().getId());
         if (medico.isEmpty()) {
            throw new IllegalArgumentException("Médico não encontrado.");
@@ -45,7 +37,7 @@ public class ConsultaService {
             throw new IllegalArgumentException("Paciente inválido");
         }
         if (paciente.get().getRole() != Role.PACIENTE ) {
-            throw  new IllegalArgumentException("O usuário " + paciente.get().getId() + "não é paciente");
+            throw new IllegalArgumentException("O usuário " + paciente.get().getId() + "não é paciente");
         }
 
         Consulta consultaSolicitada = new Consulta();
