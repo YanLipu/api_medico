@@ -1,6 +1,6 @@
 package com.gerenciamento_medico.medico_api.security;
 
-import com.gerenciamento_medico.medico_api.repository.UsuarioRepository;
+import com.gerenciamento_medico.medico_api.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +21,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     JwtToken jwtToken;
 
     @Autowired
-    UsuarioRepository usuarioRepository;
+    UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -29,7 +29,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (token != null) {
             var subject = jwtToken.validateToken(token);
             System.out.println(subject);
-            UserDetails user = usuarioRepository.findByEmail(subject);
+            UserDetails user = userRepository.findByEmail(subject);
             System.out.println(user.getAuthorities());
 
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());

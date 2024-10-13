@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
-public class ConsultaDTO {
+public class ConsultationDTO {
     // Getters e Setters
     private Long pacienteId;
     private Long medicoId;

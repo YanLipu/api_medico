@@ -1,8 +1,8 @@
 package com.gerenciamento_medico.medico_api.controller;
 
-import com.gerenciamento_medico.medico_api.DTO.AutenticacaoDTO;
+import com.gerenciamento_medico.medico_api.DTO.AuthenticationDTO;
 import com.gerenciamento_medico.medico_api.DTO.LoginDTO;
-import com.gerenciamento_medico.medico_api.model.Usuario;
+import com.gerenciamento_medico.medico_api.model.User;
 import com.gerenciamento_medico.medico_api.security.JwtToken;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("auth")
-public class AutenticacaoController {
+public class AuthenticationController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -25,12 +25,12 @@ public class AutenticacaoController {
     JwtToken jwtToken;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid AutenticacaoDTO data) {
+    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
         try {
             var emailSenha = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
             var auth =  this.authenticationManager.authenticate(emailSenha);
 
-            var token = jwtToken.generateToken((Usuario) auth.getPrincipal());
+            var token = jwtToken.generateToken((User) auth.getPrincipal());
 
             return ResponseEntity.ok(new LoginDTO(token));
         } catch (Exception e) {

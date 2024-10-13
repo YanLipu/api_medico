@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
-public class Consulta {
+public class Consultation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,11 +17,11 @@ public class Consulta {
 
     @ManyToOne
     @JoinColumn(name = "paciente_id")
-    private Usuario paciente;
+    private User paciente;
 
     @ManyToOne
     @JoinColumn(name = "medico_id")
-    private Usuario medico;
+    private User medico;
 
     @Column(nullable = false)
     private LocalDateTime dataConsulta;
@@ -33,7 +33,7 @@ public class Consulta {
     private String localConsulta;
 
     @Enumerated(EnumType.STRING)
-    private StatusConsulta status;
+    private StatusConsultation status;
 
     private String parecerMedico;
 }

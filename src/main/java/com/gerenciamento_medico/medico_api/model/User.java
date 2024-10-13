@@ -13,8 +13,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-public class Usuario implements UserDetails {
-    // Getters e Setters
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,11 +29,11 @@ public class Usuario implements UserDetails {
     private Role role;
 
     @OneToMany(mappedBy = "paciente")
-    private List<Consulta> consultas;
+    private List<Consultation> consultations;
 
-    public Usuario() {}
+    public User() {}
 
-    public Usuario(Long id) {
+    public User(Long id) {
         this.id = id;
     }
 
@@ -43,24 +42,24 @@ public class Usuario implements UserDetails {
         if (this.role == Role.ADMIN) {
             return List.of(
                     new SimpleGrantedAuthority("ADMIN"),
-                    new SimpleGrantedAuthority("MEDICO"),
-                    new SimpleGrantedAuthority("ENFERMEIRO"),
-                    new SimpleGrantedAuthority("PACIENTE")
+                    new SimpleGrantedAuthority("DOCTOR"),
+                    new SimpleGrantedAuthority("NURSE"),
+                    new SimpleGrantedAuthority("PATIENT")
             );
-        } else if (this.role == Role.MEDICO) {
+        } else if (this.role == Role.DOCTOR) {
             return List.of(
-                    new SimpleGrantedAuthority("MEDICO"),
-                    new SimpleGrantedAuthority("ENFERMEIRO"),
-                    new SimpleGrantedAuthority("PACIENTE")
+                    new SimpleGrantedAuthority("DOCTOR"),
+                    new SimpleGrantedAuthority("NURSE"),
+                    new SimpleGrantedAuthority("PATIENT")
             );
-        } else if (this.role == Role.ENFERMEIRO) {
+        } else if (this.role == Role.NURSE) {
             return List.of(
-                    new SimpleGrantedAuthority("ENFERMEIRO"),
-                    new SimpleGrantedAuthority("PACIENTE")
+                    new SimpleGrantedAuthority("NURSE"),
+                    new SimpleGrantedAuthority("PATIENT")
             );
-        } else if(this.role == Role.PACIENTE) {
+        } else if(this.role == Role.PATIENT) {
             return List.of(
-                    new SimpleGrantedAuthority("PACIENTE")
+                    new SimpleGrantedAuthority("PATIENT")
             );
         } else {
             return List.of();

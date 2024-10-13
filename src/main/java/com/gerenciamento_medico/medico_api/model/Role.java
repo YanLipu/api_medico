@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum Role {
-    PACIENTE("paciente"),
-    ENFERMEIRO("enfermeiro"),
-    MEDICO("medico"),
+    PATIENT("patient"),
+    NURSE("nurse"),
+    DOCTOR("doctor"),
     ADMIN("admin");
 
     private String role;
