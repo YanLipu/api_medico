@@ -9,6 +9,7 @@ public record ConsultationResponseDTO(
         LocalDateTime date_consultation,
         DoctorResponseDTO doctor,
         PatientResponseDTO patient,
-        StatusConsultation status
+        StatusConsultation status,
+        String medical_observation
 ) {
 }

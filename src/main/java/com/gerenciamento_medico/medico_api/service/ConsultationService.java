@@ -1,6 +1,7 @@
 package com.gerenciamento_medico.medico_api.service;
 
 import com.gerenciamento_medico.medico_api.DTO.request.ConsultationDTO;
+import com.gerenciamento_medico.medico_api.DTO.request.ConsultationFinishDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.ConsultationResponseDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.DoctorResponseDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.PatientResponseDTO;
@@ -9,9 +10,11 @@ import com.gerenciamento_medico.medico_api.model.Role;
 import com.gerenciamento_medico.medico_api.model.StatusConsultation;
 import com.gerenciamento_medico.medico_api.model.User;
 import com.gerenciamento_medico.medico_api.repository.ConsultationRepository;
+import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.dnd.InvalidDnDOperationException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +66,8 @@ public class ConsultationService {
                 savedConsultation.getDate_consultation(),
                 savedDoctor,
                 savedPatient,
-                savedConsultation.getStatus()
+                savedConsultation.getStatus(),
+                savedConsultation.getMedical_observation()
         );
     }
 
@@ -77,15 +81,23 @@ public class ConsultationService {
         return null;
     }
 
-    public Consultation finishConsultation(Long id, String medicalObservation) {
-        Optional<Consultation> consultaOptional = consultationRepository.findById(id);
-        if (consultaOptional.isPresent()) {
-            Consultation consultation = consultaOptional.get();
-            consultation.setStatus(StatusConsultation.COMPLETED);
-            consultation.setMedical_observation(medicalObservation);
-            return consultationRepository.save(consultation);
+    public ConsultationResponseDTO finishConsultation(Long id, ConsultationFinishDTO finishDTO) {
+        Optional<Consultation> consultationOptional = consultationRepository.findById(id);
+        if (consultationOptional.isEmpty()) {
+            throw new IllegalArgumentException("Consultation not found with id: " + id);
         }
-        return null;
+
+        Consultation consultation = consultationOptional.get();
+        if (consultation.getStatus() != StatusConsultation.APPROVED) {
+            throw new ValidationException("Only approved consultations can be finished.");
+        }
+
+        consultation.setStatus(StatusConsultation.COMPLETED);
+        consultation.setMedical_observation(finishDTO.medical_observation());
+
+        Consultation savedConsultation = consultationRepository.save(consultation);
+
+        return createConsultationResponseDTO(savedConsultation);
     }
 
     private User validateAndGetDoctor(Long doctorId) {
@@ -133,16 +145,23 @@ public class ConsultationService {
         return consultation;
     }
 
-    private ConsultationResponseDTO createConsultationResponseDTO(Consultation savedConsultation) {
-        DoctorResponseDTO savedDoctor = new DoctorResponseDTO(savedConsultation.getDoctor().getId(), savedConsultation.getDoctor().getName());
-        PatientResponseDTO savedPatient = new PatientResponseDTO(savedConsultation.getPatient().getId(), savedConsultation.getPatient().getName());
+    private ConsultationResponseDTO createConsultationResponseDTO(Consultation consultation) {
+        DoctorResponseDTO doctorDTO = new DoctorResponseDTO(
+                consultation.getDoctor().getId(),
+                consultation.getDoctor().getName()
+        );
+        PatientResponseDTO patientDTO = new PatientResponseDTO(
+                consultation.getPatient().getId(),
+                consultation.getPatient().getName()
+        );
 
         return new ConsultationResponseDTO(
-                savedConsultation.getId(),
-                savedConsultation.getDate_consultation(),
-                savedDoctor,
-                savedPatient,
-                savedConsultation.getStatus()
+                consultation.getId(),
+                consultation.getDate_consultation(),
+                doctorDTO,
+                patientDTO,
+                consultation.getStatus(),
+                consultation.getMedical_observation()
         );
     }
 }

@@ -1,6 +1,7 @@
 package com.gerenciamento_medico.medico_api.controller;
 
 import com.gerenciamento_medico.medico_api.DTO.request.ConsultationDTO;
+import com.gerenciamento_medico.medico_api.DTO.request.ConsultationFinishDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.ConsultationResponseDTO;
 import com.gerenciamento_medico.medico_api.model.Consultation;
 import com.gerenciamento_medico.medico_api.service.ConsultationService;
@@ -36,8 +37,8 @@ public class ConsultationController {
     }
 
     @PutMapping("/{id}/finish")
-    public ResponseEntity<Consultation> finishConsultation(@PathVariable Long id, @RequestBody String medicalObservation) {
-        Consultation consultationFinalized = consultationService.finishConsultation(id, medicalObservation);
+    public ResponseEntity<ConsultationResponseDTO> finishConsultation(@PathVariable Long id, @RequestBody @Valid ConsultationFinishDTO medicalObservation) {
+        ConsultationResponseDTO consultationFinalized = consultationService.finishConsultation(id, medicalObservation);
         return consultationFinalized != null ? ResponseEntity.ok(consultationFinalized) : ResponseEntity.notFound().build();
     }
 }

@@ -31,6 +31,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/consultation/*/approve").hasAuthority("NURSE")
+                        .requestMatchers(HttpMethod.PUT, "/consultation/*/finish").hasAuthority("DOCTOR")
                         .requestMatchers(HttpMethod.POST, "/consultation").hasAuthority("PATIENT")
                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
