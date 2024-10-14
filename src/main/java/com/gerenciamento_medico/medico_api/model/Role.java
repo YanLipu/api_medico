@@ -9,7 +9,7 @@ public enum Role {
     DOCTOR("doctor"),
     ADMIN("admin");
 
-    private String role;
+    private final String role;
 
     private Role(String role) {
         this.role = role;

@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Ocorreu um erro interno no servidor",
+                "Internal server error.",
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -69,9 +69,6 @@ class ErrorResponse {
         this.message = message;
         this.timestamp = timestamp;
     }
-
-    // Constructor, getters, and setters
-    // ...
 }
 
 @Getter
@@ -87,7 +84,4 @@ class ValidationErrorResponse extends ErrorResponse {
         super(status, message, timestamp);
         this.errors = errors;
     }
-
-    // Constructor, getters, and setters
-    // ...
 }

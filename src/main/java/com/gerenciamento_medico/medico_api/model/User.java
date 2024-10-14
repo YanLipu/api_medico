@@ -1,5 +1,6 @@
 package com.gerenciamento_medico.medico_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,17 +19,18 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nome;
+    private String name;
 
     @Column(unique = true, nullable = false)
     private String email;
     @Column(nullable = false)
-    private String senha;
+    private String password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "paciente")
+    @OneToMany(mappedBy = "patient")
+    @JsonIgnore
     private List<Consultation> consultations;
 
     public User() {}
@@ -68,7 +70,7 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return senha;
+        return password;
     }
 
     @Override

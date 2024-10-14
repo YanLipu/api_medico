@@ -1,7 +1,7 @@
 package com.gerenciamento_medico.medico_api.controller;
 
-import com.gerenciamento_medico.medico_api.DTO.AuthenticationDTO;
-import com.gerenciamento_medico.medico_api.DTO.LoginDTO;
+import com.gerenciamento_medico.medico_api.DTO.request.AuthenticationDTO;
+import com.gerenciamento_medico.medico_api.DTO.request.LoginDTO;
 import com.gerenciamento_medico.medico_api.model.User;
 import com.gerenciamento_medico.medico_api.security.JwtToken;
 import jakarta.validation.Valid;
@@ -27,14 +27,14 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
         try {
-            var emailSenha = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
-            var auth =  this.authenticationManager.authenticate(emailSenha);
+            var emailPassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
+            var auth =  this.authenticationManager.authenticate(emailPassword);
 
             var token = jwtToken.generateToken((User) auth.getPrincipal());
 
             return ResponseEntity.ok(new LoginDTO(token));
         } catch (Exception e) {
-            throw new IllegalArgumentException("Usuário ou senha inválidos");
+            throw new IllegalArgumentException("Invalid email or password");
         }
 
     }

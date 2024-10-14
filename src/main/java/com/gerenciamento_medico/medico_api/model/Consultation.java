@@ -16,24 +16,24 @@ public class Consultation {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "paciente_id")
-    private User paciente;
+    @JoinColumn(name = "patient_id")
+    private User patient;
 
     @ManyToOne
-    @JoinColumn(name = "medico_id")
-    private User medico;
+    @JoinColumn(name = "doctor_id")
+    private User doctor;
 
     @Column(nullable = false)
-    private LocalDateTime dataConsulta;
+    private LocalDateTime date_consultation;
 
     @Column(nullable = false)
-    private String motivoConsulta;
+    private String reason_consultation;
 
     @Column(nullable = false)
-    private String localConsulta;
+    private String location_consultation;
 
     @Enumerated(EnumType.STRING)
     private StatusConsultation status;
 
-    private String parecerMedico;
+    private String medical_observation;
 }
