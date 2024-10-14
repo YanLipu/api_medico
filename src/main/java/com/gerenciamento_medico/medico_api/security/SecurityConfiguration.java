@@ -30,8 +30,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize->authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/consultation/*/approve").hasAuthority("NURSE")
                         .requestMatchers(HttpMethod.POST, "/consultation").hasAuthority("PATIENT")
-                        .requestMatchers(HttpMethod.PUT, "/consultation/{id}/finish").hasAuthority("NURSE")
                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

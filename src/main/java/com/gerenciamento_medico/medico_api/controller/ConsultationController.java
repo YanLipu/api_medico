@@ -30,8 +30,8 @@ public class ConsultationController {
     }
 
     @PutMapping("/{id}/approve")
-    public ResponseEntity<Consultation> approveConsultation(@PathVariable Long id) {
-        Consultation consultationApproved = consultationService.approveConsultation(id);
+    public ResponseEntity<ConsultationResponseDTO> approveConsultation(@PathVariable Long id) {
+        ConsultationResponseDTO consultationApproved = consultationService.approveConsultation(id);
         return consultationApproved != null ? ResponseEntity.ok(consultationApproved) : ResponseEntity.notFound().build();
     }
 
