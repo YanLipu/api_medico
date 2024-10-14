@@ -14,6 +14,8 @@ import com.gerenciamento_medico.medico_api.repository.ConsultationRepository;
 import jakarta.validation.ValidationException;
 import com.gerenciamento_medico.medico_api.exceptions.GlobalExceptionHandler.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.awt.dnd.InvalidDnDOperationException;
@@ -42,8 +44,14 @@ public class ConsultationService {
         return createConsultationResponseDTO(savedConsultation);
     }
 
-    public List<Consultation> listConsultations() {
-        return consultationRepository.findAll();
+    public Page<ConsultationResponseDTO> listAllConsultations(Pageable pageable) {
+        Page<Consultation> allConsultations = consultationRepository.findAll(pageable);
+        return allConsultations.map(this::createConsultationResponseDTO);
+    }
+
+    public Page<ConsultationResponseDTO> listAllConsultationsByDoctorId(Pageable pageable, Long doctorId) {
+        Page<Consultation> allConsultations = consultationRepository.findByDoctorId(doctorId, pageable);
+        return allConsultations.map(this::createConsultationResponseDTO);
     }
 
     public ConsultationResponseDTO approveConsultation(Long id) {
