@@ -1,9 +1,12 @@
 package com.gerenciamento_medico.medico_api.service;
 
+import com.gerenciamento_medico.medico_api.DTO.request.RegisterUserDTO;
+import com.gerenciamento_medico.medico_api.DTO.response.RegisterUserResponseDTO;
 import com.gerenciamento_medico.medico_api.model.Role;
 import com.gerenciamento_medico.medico_api.model.User;
 import com.gerenciamento_medico.medico_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,18 +18,35 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User registerUser(User user) {
-        user.setId(null);
-        return userRepository.save(user);
+    public RegisterUserResponseDTO registerUser(RegisterUserDTO user) {
+        if (this.userRepository.findByEmail(user.email()) != null) {
+            throw new IllegalArgumentException("Email address already in use");
+        }
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(user.password());
+
+        User newUser = new User();
+        newUser.setEmail(user.email());
+        newUser.setPassword(encryptedPassword);
+        newUser.setRole(Role.valueOf(user.role()));
+        newUser.setName(user.name());
+
+        this.userRepository.save(newUser);
+
+        return new RegisterUserResponseDTO(
+                newUser.getName(),
+                newUser.getEmail(),
+                newUser.getRole()
+        );
     }
 
     public User updateUser(User user) {
         Optional<User> usuarioOptional = userRepository.findById(user.getId());
         if (usuarioOptional.isPresent()) {
             User currentUser = usuarioOptional.get();
-            currentUser.setNome(user.getNome());
+            currentUser.setName(user.getName());
             currentUser.setEmail(user.getEmail());
-            currentUser.setSenha(user.getSenha());
+            currentUser.setPassword(user.getPassword());
             return userRepository.save(currentUser);
         }
         return null;

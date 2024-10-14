@@ -1,5 +1,9 @@
 package com.gerenciamento_medico.medico_api.service;
 
+import com.gerenciamento_medico.medico_api.DTO.request.ConsultationDTO;
+import com.gerenciamento_medico.medico_api.DTO.response.ConsultationResponseDTO;
+import com.gerenciamento_medico.medico_api.DTO.response.DoctorResponseDTO;
+import com.gerenciamento_medico.medico_api.DTO.response.PatientResponseDTO;
 import com.gerenciamento_medico.medico_api.model.Consultation;
 import com.gerenciamento_medico.medico_api.model.Role;
 import com.gerenciamento_medico.medico_api.model.StatusConsultation;
@@ -20,36 +24,49 @@ public class ConsultationService {
     @Autowired
     private UserService userService;
 
-    public Consultation requestConsultation(Consultation consultation) {
-        Optional<User> medico = this.userService.findDoctorById(consultation.getMedico().getId());
+    public ConsultationResponseDTO requestConsultation(ConsultationDTO consultation) {
+        Optional<User> medico = this.userService.findDoctorById(consultation.doctor_id());
         if (medico.isEmpty()) {
-           throw new IllegalArgumentException("Médico não encontrado.");
+           throw new IllegalArgumentException("Doctor not found");
         }
         if (medico.get().getRole() != Role.DOCTOR) {
-           throw new IllegalArgumentException("O usuário " + medico.get().getId() + "não é médico");
+           throw new IllegalArgumentException("The user " + medico.get().getId() + "is not doctor.");
         }
 
-        Optional<User> paciente = this.userService.findUserById(consultation.getPaciente().getId());
-        if (paciente.isEmpty()) {
-            throw new IllegalArgumentException("Paciente inválido");
+        Optional<User> patient = this.userService.findUserById(consultation.patient_id());
+        if (patient.isEmpty()) {
+            throw new IllegalArgumentException("Invalid patient");
         }
-        if (paciente.get().getRole() != Role.PATIENT ) {
-            throw new IllegalArgumentException("O usuário " + paciente.get().getId() + "não é paciente");
+        if (patient.get().getRole() != Role.PATIENT ) {
+            throw new IllegalArgumentException("The user " + patient.get().getId() + "is not patient.");
         }
 
         Consultation consultationRequested = new Consultation();
         consultationRequested.setStatus(StatusConsultation.PENDING);
-        consultationRequested.setMedico(medico.get());
-        consultationRequested.setPaciente(paciente.get());
-        consultationRequested.setDataConsulta(consultation.getDataConsulta());
-        return consultationRepository.save(consultationRequested);
+        consultationRequested.setDoctor(medico.get());
+        consultationRequested.setPatient(patient.get());
+        consultationRequested.setDate_consultation(consultation.date_consultation());
+        consultationRequested.setLocation_consultation(consultation.location_consultation());
+        consultationRequested.setReason_consultation(consultation.reason_consultation());
+
+        Consultation savedConsultation = consultationRepository.save(consultationRequested);
+
+        DoctorResponseDTO savedDoctor = new DoctorResponseDTO(savedConsultation.getDoctor().getId(), savedConsultation.getDoctor().getName());
+        PatientResponseDTO savedPatient = new PatientResponseDTO(savedConsultation.getPatient().getId(), savedConsultation.getPatient().getName());
+
+        return new ConsultationResponseDTO(
+                savedConsultation.getId(),
+                savedConsultation.getDate_consultation(),
+                savedDoctor,
+                savedPatient
+        );
     }
 
-    public List<Consultation> listarConsultas() {
+    public List<Consultation> listConsultations() {
         return consultationRepository.findAll();
     }
 
-    public Consultation aprovarConsulta(Long id) {
+    public Consultation approveConsultation(Long id) {
         Optional<Consultation> consultaOptional = consultationRepository.findById(id);
         if (consultaOptional.isPresent()) {
             Consultation consultation = consultaOptional.get();
@@ -59,7 +76,7 @@ public class ConsultationService {
         return null;
     }
 
-    public Consultation reprovarConsulta(Long id) {
+    public Consultation rejectConsultation(Long id) {
         Optional<Consultation> consultaOptional = consultationRepository.findById(id);
         if (consultaOptional.isPresent()) {
             Consultation consultation = consultaOptional.get();
@@ -69,12 +86,12 @@ public class ConsultationService {
         return null;
     }
 
-    public Consultation finalizarConsulta(Long id, String parecerMedico) {
+    public Consultation finishConsultation(Long id, String medicalObservation) {
         Optional<Consultation> consultaOptional = consultationRepository.findById(id);
         if (consultaOptional.isPresent()) {
             Consultation consultation = consultaOptional.get();
             consultation.setStatus(StatusConsultation.COMPLETED);
-            consultation.setParecerMedico(parecerMedico);
+            consultation.setMedical_observation(medicalObservation);
             return consultationRepository.save(consultation);
         }
         return null;
