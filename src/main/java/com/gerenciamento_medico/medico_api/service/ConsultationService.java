@@ -5,12 +5,14 @@ import com.gerenciamento_medico.medico_api.DTO.request.ConsultationFinishDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.ConsultationResponseDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.DoctorResponseDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.PatientResponseDTO;
+import com.gerenciamento_medico.medico_api.exceptions.UnauthorizedAccessException;
 import com.gerenciamento_medico.medico_api.model.Consultation;
 import com.gerenciamento_medico.medico_api.model.Role;
 import com.gerenciamento_medico.medico_api.model.StatusConsultation;
 import com.gerenciamento_medico.medico_api.model.User;
 import com.gerenciamento_medico.medico_api.repository.ConsultationRepository;
 import jakarta.validation.ValidationException;
+import com.gerenciamento_medico.medico_api.exceptions.GlobalExceptionHandler.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -81,15 +83,18 @@ public class ConsultationService {
         return null;
     }
 
-    public ConsultationResponseDTO finishConsultation(Long id, ConsultationFinishDTO finishDTO) {
-        Optional<Consultation> consultationOptional = consultationRepository.findById(id);
+    public ConsultationResponseDTO finishConsultation(Long consultationId, Long doctorId, ConsultationFinishDTO finishDTO) {
+        Optional<Consultation> consultationOptional = consultationRepository.findById(consultationId);
         if (consultationOptional.isEmpty()) {
-            throw new IllegalArgumentException("Consultation not found with id: " + id);
+            throw new IllegalArgumentException("Consultation not found with id: " + consultationId);
         }
 
         Consultation consultation = consultationOptional.get();
+
+        validateDoctorAccess(consultation, doctorId);
+
         if (consultation.getStatus() != StatusConsultation.APPROVED) {
-            throw new ValidationException("Only approved consultations can be finished.");
+            throw new UnauthorizedAccessException("Only approved consultations can be finished.");
         }
 
         consultation.setStatus(StatusConsultation.COMPLETED);
@@ -120,6 +125,12 @@ public class ConsultationService {
             throw new IllegalArgumentException("The user " + patientId + " is not a patient.");
         }
         return patient.get();
+    }
+
+    private void validateDoctorAccess(Consultation consultation, Long doctorId) {
+        if (!consultation.getDoctor().getId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You do not have permission to finish this consultation.");
+        }
     }
 
     private void validateConsultationTime(User doctor, LocalDateTime consultationTime) {

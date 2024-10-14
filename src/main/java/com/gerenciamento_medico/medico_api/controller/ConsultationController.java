@@ -4,10 +4,12 @@ import com.gerenciamento_medico.medico_api.DTO.request.ConsultationDTO;
 import com.gerenciamento_medico.medico_api.DTO.request.ConsultationFinishDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.ConsultationResponseDTO;
 import com.gerenciamento_medico.medico_api.model.Consultation;
+import com.gerenciamento_medico.medico_api.model.User;
 import com.gerenciamento_medico.medico_api.service.ConsultationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,8 +39,15 @@ public class ConsultationController {
     }
 
     @PutMapping("/{id}/finish")
-    public ResponseEntity<ConsultationResponseDTO> finishConsultation(@PathVariable Long id, @RequestBody @Valid ConsultationFinishDTO medicalObservation) {
-        ConsultationResponseDTO consultationFinalized = consultationService.finishConsultation(id, medicalObservation);
+    public ResponseEntity<ConsultationResponseDTO> finishConsultation(
+            @PathVariable Long id,
+            @RequestBody @Valid ConsultationFinishDTO medicalObservation,
+            Authentication authentication
+    ) {
+        User authenticatedUser = (User) authentication.getPrincipal();
+        Long doctorId = authenticatedUser.getId();
+
+        ConsultationResponseDTO consultationFinalized = consultationService.finishConsultation(id, doctorId, medicalObservation);
         return consultationFinalized != null ? ResponseEntity.ok(consultationFinalized) : ResponseEntity.notFound().build();
     }
 }
