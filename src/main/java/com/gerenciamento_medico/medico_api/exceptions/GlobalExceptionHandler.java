@@ -47,6 +47,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedAccess(UnauthorizedAccessException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, WebRequest request) {
         Map<String, String> errors = new HashMap<>();
@@ -56,7 +66,7 @@ public class GlobalExceptionHandler {
 
         ValidationErrorResponse errorResponse = new ValidationErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Erro de validação",
+                "Validation error",
                 LocalDateTime.now(),
                 errors
         );
@@ -79,20 +89,5 @@ class ErrorResponse {
         this.status = status;
         this.message = message;
         this.timestamp = timestamp;
-    }
-}
-
-@Getter
-@Setter
-class ValidationErrorResponse extends ErrorResponse {
-    private Map<String, String> errors;
-
-    public ValidationErrorResponse(Map<String, String> errors) {
-        this.errors = errors;
-    }
-
-    public ValidationErrorResponse(int status, String message, LocalDateTime timestamp, Map<String, String> errors) {
-        super(status, message, timestamp);
-        this.errors = errors;
     }
 }
