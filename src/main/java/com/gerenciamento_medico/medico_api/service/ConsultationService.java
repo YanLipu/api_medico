@@ -156,7 +156,7 @@ public class ConsultationService {
 
         Consultation updatedConsultation = consultationRepository.findById(consultationId)
                 .orElseThrow(() -> new IllegalArgumentException("Consultation not found after update."));
-        
+
         return createConsultationResponseDTO(updatedConsultation);
     }
 

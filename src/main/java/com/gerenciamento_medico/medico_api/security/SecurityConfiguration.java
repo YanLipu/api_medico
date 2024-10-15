@@ -30,6 +30,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize->authorize
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/user").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/consultation/schedule").hasAuthority("NURSE")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/consultation/*/approve").hasAuthority("NURSE")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/consultation/*/finish").hasAuthority("DOCTOR")
