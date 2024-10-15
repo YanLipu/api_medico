@@ -24,6 +24,14 @@ public class AuthenticationController {
     @Autowired
     JwtToken jwtToken;
 
+    @Operation(summary = "Authenticate a user", description = "Authenticates a user and returns a JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful authentication",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = LoginDTO.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid email or password",
+                    content = @Content)
+    })
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
         try {
