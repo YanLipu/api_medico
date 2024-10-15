@@ -28,12 +28,12 @@ public class SecurityConfiguration {
                 .csrf(csrf->csrf.disable())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize->authorize
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/user").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/consultation/schedule").hasAuthority("NURSE")
-                        .requestMatchers(HttpMethod.PUT, "/consultation/*/approve").hasAuthority("NURSE")
-                        .requestMatchers(HttpMethod.PUT, "/consultation/*/finish").hasAuthority("DOCTOR")
-                        .requestMatchers(HttpMethod.POST, "/consultation").hasAuthority("PATIENT")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/user").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/consultation/schedule").hasAuthority("NURSE")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/consultation/*/approve").hasAuthority("NURSE")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/consultation/*/finish").hasAuthority("DOCTOR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/consultation").hasAuthority("PATIENT")
                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
