@@ -1,0 +1,38 @@
+name: "Deploy to Production - AWS EC2"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout...
+        uses: actions/checkout@v3
+      - name: Setup Java...
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build with Maven...
+        run: mvn clean install -DskipTests
+      - name: Docker Hub Login...
+        run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+      - name: Build Docker Image...
+        run: docker build -t ${{secrets.DOCKER_USERNAME}}/medico_api .
+      - name: Push Docker Image...
+        run: docker push ${{secrets.DOCKER_USERNAME}}/medico_api
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull image from Docker Hub...
+        run: docker pull ${{secrets.DOCKER_USERNAME}}/medico_api:latest
+      - name: Stop Docker Container...
+        run: docker rm -f medico_api_server
+      - name: Run Docker Container...
+        run: docker run -d -p 8080:8080 -e MYSQL_USER=${{secrets.MYSQL_USER}} -e MYSQL_PASSWORD='${{secrets.MYSQL_PASSWORD}}' -e MYSQL_HOST=${{secrets.MYSQL_HOST}} -e JWT_SECRET=${{secrets.JWT_SECRET}} medico_api_server ${{secrets.DOCKER_USERNAME}}/medico_api
