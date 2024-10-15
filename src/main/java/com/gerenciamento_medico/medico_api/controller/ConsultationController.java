@@ -2,6 +2,7 @@ package com.gerenciamento_medico.medico_api.controller;
 
 import com.gerenciamento_medico.medico_api.DTO.request.ConsultationDTO;
 import com.gerenciamento_medico.medico_api.DTO.request.ConsultationFinishDTO;
+import com.gerenciamento_medico.medico_api.DTO.request.UpdateConsultationDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.ConsultationResponseDTO;
 import com.gerenciamento_medico.medico_api.model.Consultation;
 import com.gerenciamento_medico.medico_api.model.Role;
@@ -42,14 +43,11 @@ public class ConsultationController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Pagination.parseSortParams(sort)));
         User authenticatedUser = (User) authentication.getPrincipal();
 
-        Page<ConsultationResponseDTO> schedules;
         if (authenticatedUser.getRole() == Role.DOCTOR) {
             Long doctorId = authenticatedUser.getId();
             return ResponseEntity.ok(consultationService.listAllConsultationsByDoctorId(pageable, doctorId));
         }
         return ResponseEntity.ok(consultationService.listAllConsultations(pageable));
-//        return ResponseEntity.ok()
-//        return consultationService.listConsultations();
     }
 
     @PutMapping("/{id}/approve")
@@ -69,5 +67,22 @@ public class ConsultationController {
 
         ConsultationResponseDTO consultationFinalized = consultationService.finishConsultation(id, doctorId, medicalObservation);
         return consultationFinalized != null ? ResponseEntity.ok(consultationFinalized) : ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}/request-change")
+    public ResponseEntity<ConsultationResponseDTO> requestConsultationChange(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateConsultationDTO updateConsultationRequest,
+            Authentication authentication
+            ){
+        User authenticatedUser = (User) authentication.getPrincipal();
+
+        ConsultationResponseDTO consultationUpdated = consultationService.requestConsultationUpdate(
+                id,
+                authenticatedUser,
+                updateConsultationRequest
+        );
+
+        return consultationUpdated != null ? ResponseEntity.ok(consultationUpdated) : ResponseEntity.notFound().build();
     }
 }

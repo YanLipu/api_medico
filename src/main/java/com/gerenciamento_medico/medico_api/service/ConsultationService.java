@@ -2,6 +2,7 @@ package com.gerenciamento_medico.medico_api.service;
 
 import com.gerenciamento_medico.medico_api.DTO.request.ConsultationDTO;
 import com.gerenciamento_medico.medico_api.DTO.request.ConsultationFinishDTO;
+import com.gerenciamento_medico.medico_api.DTO.request.UpdateConsultationDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.ConsultationResponseDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.DoctorResponseDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.PatientResponseDTO;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -113,6 +115,51 @@ public class ConsultationService {
         return createConsultationResponseDTO(savedConsultation);
     }
 
+    public ConsultationResponseDTO requestConsultationUpdate(
+            Long consultationId,
+            User authenticatedUser,
+            UpdateConsultationDTO consultation
+    ) {
+        if (authenticatedUser.getRole() != Role.PATIENT) {
+            throw new UnauthorizedAccessException("Only patients can request consultation changes or updates");
+        }
+
+        Optional<Consultation> consultationOptional = consultationRepository.findById(consultationId);
+
+        if (consultationOptional.isEmpty()) {
+            throw new IllegalArgumentException("Consultation not found.");
+        }
+
+        Consultation existingConsultation = consultationOptional.get();
+
+        if (existingConsultation.getStatus() == StatusConsultation.COMPLETED) {
+            throw new IllegalArgumentException("Consultation is already completed");
+        }
+
+        if (authenticatedUser.getRole() == Role.PATIENT && !existingConsultation.getPatient().getId().equals(authenticatedUser.getId())) {
+            throw new UnauthorizedAccessException("You are not allowed to update this consultation");
+        }
+
+        User doctor = validateAndGetDoctor(consultation.doctor_id());
+
+        validateConsultationTime(doctor, consultation.date_consultation());
+
+        int rowsUpdated = consultationRepository.updateConsultationById(
+                consultationId,
+                StatusConsultation.PENDING,
+                consultation.date_consultation()
+        );
+
+        if (rowsUpdated == 0) {
+            throw new IllegalArgumentException("Failed to update consultation.");
+        }
+
+        Consultation updatedConsultation = consultationRepository.findById(consultationId)
+                .orElseThrow(() -> new IllegalArgumentException("Consultation not found after update."));
+        
+        return createConsultationResponseDTO(updatedConsultation);
+    }
+
     private User validateAndGetDoctor(Long doctorId) {
         Optional<User> doctor = userService.findDoctorById(doctorId);
         if (doctor.isEmpty()) {
@@ -182,5 +229,16 @@ public class ConsultationService {
                 consultation.getStatus(),
                 consultation.getMedical_observation()
         );
+    }
+
+    private Consultation updateConsultationFromDTO(UpdateConsultationDTO consultationDTO, User doctor, User patient) {
+        Consultation consultation = new Consultation();
+        consultation.setStatus(StatusConsultation.PENDING);
+        consultation.setDoctor(doctor);
+        consultation.setPatient(patient);
+        consultation.setDate_consultation(consultationDTO.date_consultation());
+        consultation.setLocation_consultation(consultationDTO.location_consultation());
+        consultation.setReason_consultation(consultationDTO.reason_consultation());
+        return consultation;
     }
 }
