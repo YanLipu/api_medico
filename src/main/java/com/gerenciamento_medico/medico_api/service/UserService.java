@@ -25,19 +25,10 @@ public class UserService {
 
         String encryptedPassword = new BCryptPasswordEncoder().encode(user.password());
 
-        User newUser = new User();
-        newUser.setEmail(user.email());
-        newUser.setPassword(encryptedPassword);
-        newUser.setRole(Role.valueOf(user.role()));
-        newUser.setName(user.name());
-
+        User newUser = registerUserFromDTO(user, encryptedPassword);
         this.userRepository.save(newUser);
 
-        return new RegisterUserResponseDTO(
-                newUser.getName(),
-                newUser.getEmail(),
-                newUser.getRole()
-        );
+        return registerUserResponseDTO(newUser);
     }
 
     public User updateUser(User user) {
@@ -74,5 +65,22 @@ public class UserService {
         }
 
         return Optional.empty();
+    }
+
+    private User registerUserFromDTO(RegisterUserDTO userDTO, String password) {
+        User user = new User();
+        user.setEmail(userDTO.email());
+        user.setPassword(password);
+        user.setName(userDTO.name());
+        user.setRole(Role.valueOf(userDTO.role()));
+        return user;
+    }
+
+    private RegisterUserResponseDTO registerUserResponseDTO(User user) {
+        return new RegisterUserResponseDTO(
+                user.getName(),
+                user.getEmail(),
+                user.getRole()
+        );
     }
 }
