@@ -1,67 +1,99 @@
-# Medical Backend API
+# 🏥 Medical Backend API
 
-This project is a REST API implementation using Java Spring Boot for managing a medical clinic.
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen.svg)
+![Java](https://img.shields.io/badge/Java-17-orange.svg)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-blue.svg)
 
-## Table Of Content
+A robust REST API implementation using Java Spring Boot for efficient management of a medical clinic.
 
-- [Getting Started](#getting-started)
-    - [Prerequistes](#prerequisites)
-- [Solution Design](#solution-design)
-    - [Database Schema](#database)
-    - [Architecture Design](#architecture-design)
-- [Installation](#installation)
-    - [Java 17](#java)
-    - [Maven](#maven)
-    - [MySQL](#mysql-server)
-- [License](#license)
-- [Links](#links)
+## 📑 Table of Contents
 
-## Getting Started
+- [🚀 Getting Started](#-getting-started)
+  - [📋 Prerequisites](#-prerequisites)
+- [🏗️ Solution Design](#️-solution-design)
+  - [💾 Database Schema](#-database-schema)
+  - [🏛️ Architecture Design](#️-architecture-design)
+- [⚙️ Installation](#️-installation)
+  - [☕ Java 17](#-java-17)
+  - [🛠️ Maven](#️-maven)
+  - [🐬 MySQL](#-mysql)
+- [🏃‍♂️ Running the Application](#️-running-the-application)
+- [📄 License](#-license)
+- [🔗 Links](#-links)
 
-This file aims to guide anyone in installing and running the project locally. You will have the ability to modify the code to make improvements and implement your own features.
+## 🚀 Getting Started
 
-### Prerequisites
+This guide will help you install and run the project locally, enabling you to modify the code, make improvements, and implement your own features.
 
-To run this project, you need to have some dependencies installed.
-- JAVA: 17.0.11 2024-04-16 LTS
-- MAVEN: 3.9.9
-- MySQL Server: 8.0
+### 📋 Prerequisites
 
-## Solution Design
+To run this project, you need to have the following dependencies installed:
 
-### Database
-The database schema follows a structure where each user has roles, which can be ADMIN, DOCTOR, NURSE, and PATIENT. Each patient can have multiple consultations, just as each doctor can have multiple consultations. There is a one-to-many relationship between the user table and the consultation table.
+- **JAVA**: 17.0.11 2024-04-16 LTS
+- **MAVEN**: 3.9.9
+- **MySQL Server**: 8.0
 
-![Database](docs\assets\database-schema.png)
+## 🏗️ Solution Design
 
-### Architecture Design
+### 💾 Database Schema
 
-The architecture was designed with the AWS environment in mind, but it can be implemented using any other cloud environment that allows the use of a dedicated server and a database. We use a VPC for the EC2 instance, where the application build will be hosted, and the RDS instance using MySQL.
+The database schema follows a structure where each user has roles (ADMIN, DOCTOR, NURSE, and PATIENT). Patients and doctors can have multiple consultations, with a one-to-many relationship between the user table and the consultation table.
 
-![Architecture Design](docs\assets\cloud-arch.png)
+![Database Schema](https://i.imgur.com/iEEQoPp.png)
 
-## Installation
+### 🏛️ Architecture Design
 
-### Java
-To install **Java** you can follow the steps [here](docs\JAVA.md).
+The architecture is designed with the AWS environment in mind but can be implemented using any cloud environment that supports a dedicated server and database. We use a VPC for the EC2 instance to host the application build and an RDS instance using MySQL.
 
-### Maven
-To install **Maven** you can follow the steps [here](docs\MAVEN.md).
+![Architecture Design](https://i.imgur.com/mlIEKUA.png)
 
-### MySQL Server
-To install **MySQL Server** you can follow the steps [here](docs\MYSQL.md).
+## ⚙️ Installation
 
-Create a database in MySQL called `medico` with user `root` and password `root`. 
+### ☕ Java 17
 
-IMPORTANT: This configuration in only for development purposes.
+To install **Java**, follow the steps in our [Java Installation Guide](docs/JAVA.md).
 
-### Start Application
-If everting goes well, you should to abled to run the project.
-- Run the maven command:
-```bash
-    mvn spring-boot:run
+### 🛠️ Maven
+
+For **Maven** installation, refer to our [Maven Installation Guide](docs/MAVEN.md).
+
+### 🐬 MySQL
+
+To set up **MySQL Server**, follow our [MySQL Installation Guide](docs/MYSQL.md).
+
+Then, create a database in MySQL:
+
+```sql
+CREATE DATABASE medico;
+CREATE USER 'root'@'localhost' IDENTIFIED BY 'root';
+GRANT ALL PRIVILEGES ON medico.* TO 'root'@'localhost';
+FLUSH PRIVILEGES;
 ```
-Or, if you are using some IDE like IntelliJ or VSCode just click `RUN` in your IDE.
 
+> **IMPORTANT**: This configuration is for development purposes only. Ensure to use secure credentials in production.
 
+## 🏃‍♂️ Running the Application
 
+If everything is set up correctly, you can run the project using one of these methods:
+
+1. Using Maven command:
+   ```bash
+   mvn spring-boot:run
+   ```
+
+2. Using an IDE like IntelliJ or VSCode:
+  - Open the project in your IDE
+  - Locate the main application file
+  - Click the `RUN` button
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## 🔗 Links
+
+- [API Documentation](http://localhost:8080/swagger-ui/index.html)
+
+---
+
+Made with ❤️ by [José Yan Lipu](https://lipusolutions.com)
