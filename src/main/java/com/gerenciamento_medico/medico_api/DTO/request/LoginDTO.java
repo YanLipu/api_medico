@@ -4,6 +4,7 @@ public record LoginDTO(
         String token,
         String name,
         String email,
-        String role
+        String role,
+        Long id
 ) {
 }
