@@ -16,6 +16,7 @@ public class CorsConfig {
 
         // Allow requests from localhost:3000
         config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin("https://lipuclinicmanager.netlify.app");
 
         // Allow common HTTP methods
         config.addAllowedMethod("GET");
