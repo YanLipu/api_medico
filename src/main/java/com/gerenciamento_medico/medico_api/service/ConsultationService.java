@@ -56,6 +56,11 @@ public class ConsultationService {
         return allConsultations.map(this::createConsultationResponseDTO);
     }
 
+    public Page<ConsultationResponseDTO> listAllConsultationsByPatientId(Pageable pageable, Long patientId) {
+        Page<Consultation> allConsultationsByPatient = consultationRepository.findByPatientId(patientId, pageable);
+        return allConsultationsByPatient.map(this::createConsultationResponseDTO);
+    }
+
     public ConsultationResponseDTO approveConsultation(Long id) {
         Optional<Consultation> consultationOptional = consultationRepository.findById(id);
         if(consultationOptional.isEmpty()) {
@@ -79,7 +84,8 @@ public class ConsultationService {
                 savedDoctor,
                 savedPatient,
                 savedConsultation.getStatus(),
-                savedConsultation.getMedical_observation()
+                savedConsultation.getMedical_observation(),
+                savedConsultation.getLocation_consultation()
         );
     }
 
@@ -160,6 +166,21 @@ public class ConsultationService {
         return createConsultationResponseDTO(updatedConsultation);
     }
 
+    public Page<ConsultationResponseDTO> listConsultationsByStatus(Pageable pageable, StatusConsultation status) {
+        Page<Consultation> consultations = consultationRepository.findByStatus(status, pageable);
+        return consultations.map(this::createConsultationResponseDTO);
+    }
+
+    public Page<ConsultationResponseDTO> listConsultationsByDoctorIdAndStatus(Pageable pageable, Long doctorId, StatusConsultation status) {
+        Page<Consultation> consultations = consultationRepository.findByDoctorIdAndStatus(doctorId, status, pageable);
+        return consultations.map(this::createConsultationResponseDTO);
+    }
+
+    public Page<ConsultationResponseDTO> listConsultationsByPatientIdAndStatus(Pageable pageable, Long patientId, StatusConsultation status) {
+        Page<Consultation> consultations = consultationRepository.findByPatientIdAndStatus(patientId, status, pageable);
+        return consultations.map(this::createConsultationResponseDTO);
+    }
+
     private User validateAndGetDoctor(Long doctorId) {
         Optional<User> doctor = userService.findDoctorById(doctorId);
         if (doctor.isEmpty()) {
@@ -227,7 +248,8 @@ public class ConsultationService {
                 doctorDTO,
                 patientDTO,
                 consultation.getStatus(),
-                consultation.getMedical_observation()
+                consultation.getMedical_observation(),
+                consultation.getLocation_consultation()
         );
     }
 

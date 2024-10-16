@@ -10,6 +10,7 @@ public record ConsultationResponseDTO(
         DoctorResponseDTO doctor,
         PatientResponseDTO patient,
         StatusConsultation status,
-        String medical_observation
+        String medical_observation,
+        String location_consultation
 ) {
 }

@@ -29,10 +29,22 @@ public interface ConsultationRepository extends JpaRepository<Consultation, Long
     @Query("SELECT c FROM Consultation c WHERE c.doctor.id = :doctorId")
     Page<Consultation> findByDoctorId(@Param("doctorId") Long doctorId, Pageable pageable);
 
+    @Query("SELECT c FROM Consultation c WHERE c.patient.id = :patientId")
+    Page<Consultation> findByPatientId(@Param("patientId") Long patientId, Pageable pageable);
+
     @Modifying
     @Transactional  // Required to wrap the update operation in a transaction
     @Query("UPDATE Consultation c SET c.status = :status, c.date_consultation = :dateConsultation WHERE c.id = :consultationId")
     int updateConsultationById(@Param("consultationId") Long consultationId,
                                @Param("status") StatusConsultation status,
                                @Param("dateConsultation") LocalDateTime dateConsultation);
+
+    @Query("SELECT c FROM Consultation c WHERE c.status = :status")
+    Page<Consultation> findByStatus(@Param("status") StatusConsultation status, Pageable pageable);
+
+    @Query("SELECT c FROM Consultation c WHERE c.doctor.id = :doctorId AND c.status = :status")
+    Page<Consultation> findByDoctorIdAndStatus(@Param("doctorId") Long doctorId, @Param("status") StatusConsultation status, Pageable pageable);
+
+    @Query("SELECT c FROM Consultation c WHERE c.patient.id = :patientId AND c.status = :status")
+    Page<Consultation> findByPatientIdAndStatus(@Param("patientId") Long patientId, @Param("status") StatusConsultation status, Pageable pageable);
 }
