@@ -2,6 +2,7 @@ package com.gerenciamento_medico.medico_api.controller;
 
 import com.gerenciamento_medico.medico_api.DTO.request.RegisterUserDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.RegisterUserResponseDTO;
+import com.gerenciamento_medico.medico_api.DTO.response.UserSearchResponseDTO;
 import com.gerenciamento_medico.medico_api.model.Role;
 import com.gerenciamento_medico.medico_api.model.User;
 import com.gerenciamento_medico.medico_api.repository.UserRepository;
@@ -60,9 +61,21 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = User.class))),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
+
     @GetMapping("/{id}")
     public ResponseEntity<User> findUserById(@PathVariable Long id) {
         Optional<User> user = userService.findUserById(id);
         return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @Operation(summary = "Search users by name", description = "Retrieves a list of users whose names start with the given string")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list of users",
+                    content = @Content(schema = @Schema(implementation = UserSearchResponseDTO.class)))
+    })
+    @GetMapping("/search")
+    public ResponseEntity<UserSearchResponseDTO> searchUsersByName(@RequestParam String name) {
+        UserSearchResponseDTO result = userService.searchUsersByName(name);
+        return ResponseEntity.ok(result);
     }
 }

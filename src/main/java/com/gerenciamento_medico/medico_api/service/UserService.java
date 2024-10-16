@@ -2,15 +2,18 @@ package com.gerenciamento_medico.medico_api.service;
 
 import com.gerenciamento_medico.medico_api.DTO.request.RegisterUserDTO;
 import com.gerenciamento_medico.medico_api.DTO.response.RegisterUserResponseDTO;
+import com.gerenciamento_medico.medico_api.DTO.response.UserSearchResponseDTO;
 import com.gerenciamento_medico.medico_api.model.Role;
 import com.gerenciamento_medico.medico_api.model.User;
 import com.gerenciamento_medico.medico_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -65,6 +68,15 @@ public class UserService {
         }
 
         return Optional.empty();
+    }
+
+    public UserSearchResponseDTO searchUsersByName(String name) {
+        List<User> users = userRepository.findByNameStartingWithIgnoreCase(name, PageRequest.of(0, 100));
+        List<UserSearchResponseDTO.UserSearchItem> userItems = users.stream()
+                .map(user -> new UserSearchResponseDTO.UserSearchItem(user.getId(), user.getName(), user.getEmail()))
+                .collect(Collectors.toList());
+        int totalResults = userRepository.findByNameStartingWithIgnoreCase(name, PageRequest.of(0, Integer.MAX_VALUE)).size();
+        return new UserSearchResponseDTO(userItems, totalResults);
     }
 
     private User registerUserFromDTO(RegisterUserDTO userDTO, String password) {
