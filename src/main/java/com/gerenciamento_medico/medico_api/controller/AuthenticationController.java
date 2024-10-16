@@ -12,13 +12,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -50,11 +48,36 @@ public class AuthenticationController {
             String name = ((User) auth.getPrincipal()).getName();
             String email = ((User) auth.getPrincipal()).getEmail();
             String role = ((User) auth.getPrincipal()).getRole().getRole();
+            Long id = ((User) auth.getPrincipal()).getId();
 
-            return ResponseEntity.ok(new LoginDTO(token, name, email, role));
+            return ResponseEntity.ok(new LoginDTO(token, name, email, role, id));
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid email or password");
         }
 
     }
+
+
+    @Operation(summary = "Validate JWT token", description = "Checks if the provided JWT token is valid")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Valid token"),
+            @ApiResponse(responseCode = "401", description = "Invalid or expired token")
+    })
+    @GetMapping("/validate-token")
+    public ResponseEntity validateToken(@RequestHeader("Authorization") String token) {
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+
+            if (jwtToken.validateToken(token) != "") {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
 }
